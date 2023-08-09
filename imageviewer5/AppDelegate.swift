@@ -81,7 +81,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         NextPic(inc: -1)
     }
     
+    @IBAction func randomFile(_sender: NSMenuItem) {
+        //print("Pressed prev")
+        NextPic(inc: Int.random(in:1..<totalFilesInFolder))
+    }
+
     @IBAction func openPrefs(_sender: NSMenuItem) {
+        //print("Pressed random")
         OpenPrefsWindow()
     }
     
@@ -248,8 +254,9 @@ func set_new_url(in_url: String) { // This is the main thing. It gets called whe
     
     
     // Enable menu items since we now should have a image loaded
-    subMenu?.item(withTitle: "Next")?.isEnabled = true
     subMenu?.item(withTitle: "Previous")?.isEnabled = true
+    subMenu?.item(withTitle: "Next")?.isEnabled = true
+    subMenu?.item(withTitle: "Random")?.isEnabled = true
     subMenu?.item(withTitle: "Copy Image")?.isEnabled = true
     subMenu?.item(withTitle: "Copy Path to Image")?.isEnabled = true
     subMenu?.item(withTitle: "Delete")?.isEnabled = true // TODO enable this only if file exists
@@ -350,17 +357,22 @@ func check_image_folder(file_url_string: String) {
     
 }
 
+// swift negative modulo is still negative
+// 'fix' operator %% from https://stackoverflow.com/questions/41180292/negative-number-modulo-in-swift
+infix operator %%
+
+extension Int {
+    static func %% (_ left: Int, _ right: Int) -> Int {
+        if left >= 0 { return left % right }
+        if left >= -right { return (left+right) }
+        return ((left % right)+right)%right
+    }
+}
+
 func NextPic(inc: Int) {
     //print("Current picture is", files_in_folder[curr!])
-    var next = currentImageIndex + inc
+    var next = (currentImageIndex + inc) %% totalFilesInFolder
     
-    if next >= totalFilesInFolder {
-        // we've gone through all pictures in the folder... lets go to the first one!
-        next = 0 // TODO show some fancy loop indication here
-    } else if next < 0 {
-        // we've gone through all pictures in the folder, but backwards... lets go to the last one!
-        next = totalFilesInFolder - 1
-    }
     //print("Next is", files_in_folder[next])
     let next_url = files_in_folder[next]
     set_new_url(in_url: next_url)
