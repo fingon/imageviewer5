@@ -195,6 +195,7 @@ func spawn_window() {
     
     //contentView.frame(minWidth: CGFloat(current_image_width), minHeight:CGFloat(current_image_height))
     window.title = DefaultWindowTitle
+    window.backgroundColor = NSColor.black
     window.center()
     window.setFrameAutosaveName("Main Window")
     window.contentView = NSHostingView(rootView: contentView)
